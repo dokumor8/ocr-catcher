@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OCR Result</title>
+    <script>
+        function fetchOCRResult() {
+            fetch('/get_ocr_result')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerText = data.text;
+                })
+                .catch(error => console.error('Error fetching OCR result:', error));
+        }
+
+        // Fetch the OCR result every 5 seconds
+        setInterval(fetchOCRResult, 5000);
+    </script>
+</head>
+<body>
+    <h1>OCR Result</h1>
+    <pre id="result"></pre>
+</body>
+</html>

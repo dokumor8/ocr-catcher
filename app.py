@@ -1,8 +1,9 @@
-from flask import Flask, render_template
-from flask_socketio import SocketIO
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+
+# Store the latest OCR result
+latest_ocr_result = ""
 
 
 @app.route("/")
@@ -10,10 +11,17 @@ def index():
     return render_template("index.html")
 
 
-@socketio.on("connect")
-def test_connect():
-    print("Client connected")
+@app.route("/upload", methods=["POST"])
+def upload():
+    global latest_ocr_result
+    latest_ocr_result = request.json.get("text", "")
+    return jsonify({"status": "success"})
+
+
+@app.route("/get_ocr_result", methods=["GET"])
+def get_ocr_result():
+    return jsonify({"text": latest_ocr_result})
 
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)
+    app.run(debug=True)
