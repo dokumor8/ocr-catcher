@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify, render_template
+import subprocess
+import requests
 
 app = Flask(__name__)
 
@@ -24,4 +26,7 @@ def get_ocr_result():
 
 
 if __name__ == "__main__":
+    result = subprocess.run(
+        ["./venv/bin/python", "watcher.py"],
+    )
     app.run(debug=True)

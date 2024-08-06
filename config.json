@@ -1,0 +1,5 @@
+{
+    "ocr_script": "/common/japanese/ocr/onnx_model/PaddleOCR-ONNX-Sample/ocr.sh",
+    "ocr_cwd": "/common/japanese/ocr/onnx_model/PaddleOCR-ONNX-Sample",
+    "screenshots_dir": "/common/japanese/ocr/screenshots/"
+}
