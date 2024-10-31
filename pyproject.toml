@@ -1,0 +1,10 @@
+[project]
+name = "doku-ocr"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "flask-socketio>=5.4.1",
+    "watchdog>=5.0.3",
+]
