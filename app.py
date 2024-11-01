@@ -26,7 +26,7 @@ def save_ocr_results(results):
 @app.route("/")
 def index():
     ocr_results = load_ocr_results()
-    recent_results = ocr_results[-10:]  # Get the 10 most recent results
+    recent_results = reversed(ocr_results[-10:])  # Get the 10 most recent results
     return render_template("index.html", results=recent_results)
 
 
@@ -34,7 +34,7 @@ def index():
 def handle_connect():
     print("Client connected")
     ocr_results = load_ocr_results()
-    recent_results = ocr_results[-10:]  # Get the 10 most recent results
+    recent_results = reversed(ocr_results[-10:])  # Get the 10 most recent results
     emit("ocr_result", {"text": recent_results})
 
 
@@ -49,7 +49,7 @@ def handle_update_ocr_result(data):
     ocr_results.append(data["text"])
     save_ocr_results(ocr_results)
     print(f'Received OCR result: {data["text"]}')
-    recent_results = ocr_results[-10:]  # Get the 10 most recent results
+    recent_results = reversed(ocr_results[-10:])  # Get the 10 most recent results
     emit("ocr_result", {"text": recent_results}, broadcast=True)
 
 
