@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
 import subprocess
-import requests
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 # Store the latest OCR result
 latest_ocr_result = ""
@@ -13,20 +14,26 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/upload", methods=["POST"])
-def upload():
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+    emit('ocr_result', {'text': latest_ocr_result})
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
+
+
+@socketio.on('update_ocr_result')
+def update_ocr_result(result):
     global latest_ocr_result
-    latest_ocr_result = request.json.get("text", "")
-    return jsonify({"status": "success"})
-
-
-@app.route("/get_ocr_result", methods=["GET"])
-def get_ocr_result():
-    return jsonify({"text": latest_ocr_result})
+    latest_ocr_result = result["text"]
+    socketio.emit('ocr_result', {'text': latest_ocr_result})
 
 
 if __name__ == "__main__":
     result = subprocess.run(
         ["./venv/bin/python", "watcher.py"],
     )
-    app.run(debug=True)
+    socketio.run(app, debug=True)

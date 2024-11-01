@@ -1,9 +1,23 @@
+# watcher.py
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import requests
 import subprocess
 import json
+import socketio
+
+# Initialize a Socket.IO client
+sio = socketio.Client()
+
+
+@sio.event
+def connect():
+    print('Connected to Flask server')
+
+
+@sio.event
+def disconnect():
+    print('Disconnected from Flask server')
 
 
 class ScreenshotHandler(FileSystemEventHandler):
@@ -17,17 +31,12 @@ class ScreenshotHandler(FileSystemEventHandler):
         if event.src_path.endswith(".png"):  # Adjust the file extension if needed
             print(f"Processing {event.src_path}")
             ocr_result = process_image(event.src_path, self.ocr_script, self.ocr_cwd)
+            print(ocr_result)
             send_to_flask_server(ocr_result)
 
 
 def send_to_flask_server(ocr_result):
-    url = "http://localhost:5000/upload"
-    payload = {"text": ocr_result}
-    response = requests.post(url, json=payload)
-    if response.status_code == 200:
-        print("OCR result sent successfully")
-    else:
-        print("Failed to send OCR result")
+    sio.emit('update_ocr_result', {'text': ocr_result})
 
 
 def process_image(image_path, script_path, cwd_path):
@@ -51,9 +60,14 @@ if __name__ == "__main__":
     observer.schedule(event_handler, path=screenshot_dir, recursive=False)
     observer.start()
 
+    time.sleep(5)
+    # Connect to the Flask server
+    sio.connect('http://localhost:5000')
+
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
+    sio.disconnect()
