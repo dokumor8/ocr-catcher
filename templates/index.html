@@ -8,9 +8,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
 <body>
-    <div id="ocr-result" style="font-size: 40px;" ></div>
-
+    <div id="ocr-results" style="font-size: 40px;" ></div>
     <script>
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socket.on('ocr_result', (data) => {
+            const ocrResultsDiv = document.getElementById('ocr-results');
+            ocrResultsDiv.innerHTML = '';  // Clear previous results
+            data.text.forEach((result, index) => {
+                const p = document.createElement('p');
+                p.innerText = `Result ${index + 1}: ${result}`;
+                ocrResultsDiv.appendChild(p);
+            });
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+        });
+    </script>
+    <!-- <script>
         const socket = io();
 
         socket.on('connect', () => {
@@ -24,6 +44,8 @@
         socket.on('disconnect', () => {
             console.log('Disconnected from server');
         });
-    </script>
+    </script> -->
 </body>
 </html>
+
+
