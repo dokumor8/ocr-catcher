@@ -14,19 +14,21 @@ OCR_RESULTS_FILE = "ocr_results.json"
 def load_ocr_results():
     if not os.path.exists(OCR_RESULTS_FILE):
         return []
-    with open(OCR_RESULTS_FILE, "r") as f:
+    with open(OCR_RESULTS_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def save_ocr_results(results):
-    with open(OCR_RESULTS_FILE, "w") as f:
-        json.dump(results, f)
+    with open(OCR_RESULTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False)
 
 
 @app.route("/")
 def index():
     ocr_results = load_ocr_results()
-    recent_results = reversed(ocr_results[-10:])  # Get the 10 most recent results
+    recent_results = ocr_results[-10:][::-1]  # Get the 10 most recent results
+    print(recent_results)
+    print(ocr_results)
     return render_template("index.html", results=recent_results)
 
 
@@ -34,7 +36,7 @@ def index():
 def handle_connect():
     print("Client connected")
     ocr_results = load_ocr_results()
-    recent_results = reversed(ocr_results[-10:])  # Get the 10 most recent results
+    recent_results = ocr_results[-10:][::-1]  # Get the 10 most recent results
     emit("ocr_result", {"text": recent_results})
 
 
@@ -49,7 +51,7 @@ def handle_update_ocr_result(data):
     ocr_results.append(data["text"])
     save_ocr_results(ocr_results)
     print(f'Received OCR result: {data["text"]}')
-    recent_results = reversed(ocr_results[-10:])  # Get the 10 most recent results
+    recent_results = list(reversed(ocr_results[-10:]))  # Get the 10 most recent results
     emit("ocr_result", {"text": recent_results}, broadcast=True)
 
 

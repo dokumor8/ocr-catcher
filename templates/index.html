@@ -8,7 +8,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
 <body>
-    <div id="ocr-results" style="font-size: 40px;" ></div>
+    <div id="ocr-results" style="font-size: 40px;" >
+        {% if results %}
+            {% for result in results %}
+                <p>{{ result }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
     <script>
         const socket = io();
 
@@ -21,7 +27,7 @@
             ocrResultsDiv.innerHTML = '';  // Clear previous results
             data.text.forEach((result, index) => {
                 const p = document.createElement('p');
-                p.innerText = `Result ${index + 1}: ${result}`;
+                p.innerText = `${result}`;
                 ocrResultsDiv.appendChild(p);
             });
         });
