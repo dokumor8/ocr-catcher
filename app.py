@@ -3,12 +3,28 @@ from flask_socketio import SocketIO, emit
 import subprocess
 import json
 import os
-
-app = Flask(__name__)
-socketio = SocketIO(app)
+import sys
 
 # File to store OCR results
 OCR_RESULTS_FILE = "ocr_results.json"
+
+
+def create_app():
+    result = subprocess.Popen(
+        [sys.executable, "watcher.py"],
+        # stdout=subprocess.PIPE,
+        # stderr=subprocess.PIPE,
+        text=True,  # Use text mode to handle output as strings
+        # shell=True  # Use shell to execute the command
+    )
+
+    print(result)
+    app = Flask(__name__)
+    socketio = SocketIO(app)
+    return app, socketio
+
+
+app, socketio = create_app()
 
 
 def load_ocr_results():
@@ -56,7 +72,5 @@ def handle_update_ocr_result(data):
 
 
 if __name__ == "__main__":
-    result = subprocess.run(
-        ["./venv/bin/python", "watcher.py"],
-    )
+
     socketio.run(app, debug=True)

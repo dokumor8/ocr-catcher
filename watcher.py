@@ -49,7 +49,8 @@ def process_image(image_path, script_path, cwd_path):
     return result.stdout
 
 
-if __name__ == "__main__":
+def init():
+
     with open("config.json") as f:
         config = json.load(f)
     screenshot_dir = config["screenshots_dir"]
@@ -62,6 +63,14 @@ if __name__ == "__main__":
 
     time.sleep(5)
     # Connect to the Flask server
+    # sio.connect('http://localhost:5000')
+
+    return observer, sio
+
+
+if __name__ == "__main__":
+    observer, sio = init()
+
     sio.connect('http://localhost:5000')
 
     try:
